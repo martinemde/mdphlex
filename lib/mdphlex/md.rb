@@ -22,7 +22,7 @@ module MDPhlex
 
         if attributes.length > 0
           attributes.each do |key, value|
-            buffer << " #{key}=\"#{Phlex::Escape.html_escape(value.to_s)}\""
+            buffer << " #{key}=\"#{value}\""
           end
         end
 
@@ -298,6 +298,54 @@ module MDPhlex
 
       buffer << marker
       nil
+    end
+
+    # Override __text__ to avoid HTML escaping since markdown allows raw HTML
+    private def __text__(content)
+      state = @_state
+      return true unless state.should_render?
+
+      case content
+      when String
+        state.buffer << content
+      when Symbol
+        state.buffer << content.name
+      when nil
+        nil
+      else
+        if (formatted_object = format_object(content))
+          state.buffer << formatted_object
+        else
+          return false
+        end
+      end
+
+      true
+    end
+
+    # Override __implicit_output__ to avoid HTML escaping
+    private def __implicit_output__(content)
+      state = @_state
+      return true unless state.should_render?
+
+      case content
+      when Phlex::SGML::SafeObject
+        state.buffer << content.to_s
+      when String
+        state.buffer << content
+      when Symbol
+        state.buffer << content.name
+      when nil
+        nil
+      else
+        if (formatted_object = format_object(content))
+          state.buffer << formatted_object
+        else
+          return false
+        end
+      end
+
+      true
     end
   end
 end
