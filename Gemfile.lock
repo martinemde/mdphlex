@@ -1,0 +1,113 @@
+GIT
+  remote: https://github.com/joeldrapper/quickdraw.git
+  revision: f1175c5835a74cd753abd5030ec1e930cb3e04b0
+  specs:
+    quickdraw (0.1.0)
+      difftastic (~> 0.1)
+      io-watch (~> 0.6)
+
+PATH
+  remote: .
+  specs:
+    mdphlex (0.1.0)
+      phlex (~> 2.0)
+      zeitwerk (~> 2.7)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.3)
+    date (3.4.1)
+    difftastic (0.7.0)
+      pretty_please
+    difftastic (0.7.0-arm64-darwin)
+      pretty_please
+    difftastic (0.7.0-arm64-linux)
+      pretty_please
+    difftastic (0.7.0-x86_64-darwin)
+      pretty_please
+    difftastic (0.7.0-x86_64-linux)
+      pretty_please
+    dispersion (0.2.0)
+      prism
+    docile (1.4.1)
+    erb (5.0.2)
+    io-console (0.8.1)
+    io-watch (0.6.3)
+    irb (1.15.2)
+      pp (>= 0.6.0)
+      rdoc (>= 4.0.0)
+      reline (>= 0.4.2)
+    json (2.13.2)
+    language_server-protocol (3.17.0.5)
+    lint_roller (1.1.0)
+    parallel (1.27.0)
+    parser (3.3.9.0)
+      ast (~> 2.4.1)
+      racc
+    phlex (2.3.1)
+      zeitwerk (~> 2.7)
+    pp (0.6.2)
+      prettyprint
+    pretty_please (0.2.0)
+      dispersion (~> 0.2)
+    prettyprint (0.2.0)
+    prism (1.4.0)
+    psych (5.2.6)
+      date
+      stringio
+    racc (1.8.1)
+    rainbow (3.1.1)
+    rake (13.3.0)
+    rdoc (6.14.2)
+      erb
+      psych (>= 4.0.0)
+    regexp_parser (2.11.2)
+    reline (0.6.2)
+      io-console (~> 0.5)
+    rubocop (1.80.0)
+      json (~> 2.3)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.1.0)
+      parallel (~> 1.10)
+      parser (>= 3.3.0.2)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 2.9.3, < 3.0)
+      rubocop-ast (>= 1.46.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 4.0)
+    rubocop-ast (1.46.0)
+      parser (>= 3.3.7.2)
+      prism (~> 1.4)
+    ruby-progressbar (1.13.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
+    stringio (3.1.7)
+    sus (0.33.1)
+    unicode-display_width (3.1.5)
+      unicode-emoji (~> 4.0, >= 4.0.4)
+    unicode-emoji (4.0.4)
+    zeitwerk (2.7.3)
+
+PLATFORMS
+  arm64-darwin
+  arm64-linux
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  irb
+  mdphlex!
+  quickdraw!
+  rake (~> 13.0)
+  rubocop (~> 1.21)
+  simplecov
+  sus
+
+BUNDLED WITH
+   2.7.1
