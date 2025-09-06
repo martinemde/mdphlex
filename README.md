@@ -6,7 +6,7 @@ MDPhlex is a Phlex component for rendering Markdown. No... not rendering markdow
 
 MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or gemerating markdown output from componentized pieces..
 
-*But markdown is just text!?* Yes! but have you every tried to render clean markdown witha. ton of conditional logic? MDPhlex tames this mess with a simple familiar API. 
+*But markdown is just text!?* Yes, but have you ever tried to render clean markdown with a lot of conditional logic? MDPhlex tames thr mess with a simple and familiar API. 
 
 ## Installation
 
