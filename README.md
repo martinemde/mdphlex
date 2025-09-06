@@ -4,7 +4,9 @@
 
 MDPhlex is a Phlex component for rendering Markdown. No... not rendering markdown into HTML, rendering plain Markdown, programmatically.
 
-MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or doing something silly like passing the output to a markdown renderer to create HTML or generating blog posts that look like they were hand-written markdown.
+MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or gemerating markdown output from componentized pieces..
+
+*But markdown is just text!?* Yes! but have you every tried to render clean markdown witha. ton of conditional logic? MDPhlex tames this mess with a simple familiar API. 
 
 ## Installation
 
@@ -16,7 +18,7 @@ gem 'mdphlex'
 
 ## Creating LLM Prompts with MDPhlex
 
-MDPhlex shines when creating structured prompts for LLMs. Here's a simple example using custom tags:
+MDPhlex shines when creating structured prompts for LLMs allowing comments and organixatiin without cluttering the prompt. Here's a simple example using custom tags:
 
 ~~~ruby
 class LLMPrompt < MDPhlex::MD
@@ -32,17 +34,21 @@ class LLMPrompt < MDPhlex::MD
 
   def view_template
     system do
-      plain "You are an AI assistant specialized in #{@task}."
-      plain "\nUse the available tools to help users effectively."
-    end
+      p "You are an AI assistant specialized in #{@task}."
+      
+      h2 "Goal"
+      # we should define the goal more clearly.
+      p "Use the available tools to help the user."
 
-    plain "\n"
+      # what about guardrails?
+    end
 
     if @tools.any?
       tools do
         @tools.each do |tool_def|
           tool name: tool_def[:name] do
             plain tool_def[:description]
+            # need to add input schemas
           end
         end
       end
@@ -67,8 +73,11 @@ This outputs clean, structured markdown perfect for LLMs:
 ~~~xml
 <system>
 You are an AI assistant specialized in Ruby code analysis.
-Use the available tools to help users effectively.</system>
 
+## Goal
+Use the available tools to help the user.
+
+</system>
 <tools>
 <tool name="analyze_code">
 Analyze Ruby code for improvements</tool>
@@ -77,7 +86,7 @@ Explain Ruby concepts and patterns</tool>
 </tools>
 ~~~
 
-The XML-style tags help LLMs understand different sections of the prompt, while Ruby's dynamic nature lets you generate prompts based on runtime conditions.
+Real prompts often share pieces across different goals. MDPhlex allows you to define simple Ruby classes that render one component well, then reuse it.
 
 ## Traditional Markdown Generation
 
@@ -142,9 +151,9 @@ age = 30
 Learn more in the [documentation](https://docs.example.com).
 ~~~
 
-## Rendering MDPhlex inside Phlex::HTML
+## Rendering MDPhlex inside Phlex::HTML (and vice versa)
 
-MDPhlex components can be seamlessly integrated into your Phlex::HTML views:
+MDPhlex components are Phlex compatible. Integrate them into any Phlex::HTML views or show HTML or other wcomented in Markdown:
 
 ~~~ruby
 class ArticlePage < Phlex::HTML
