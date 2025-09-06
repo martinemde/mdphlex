@@ -84,8 +84,6 @@ Explain Ruby concepts and patterns</tool>
 </tools>
 ~~~
 
-Real prompts often share pieces across different goals. MDPhlex allows you to define simple Ruby classes that render one component well, then reuse it.
-
 ## Traditional Markdown Generation
 
 MDPhlex also works great for generating regular Markdown content:
