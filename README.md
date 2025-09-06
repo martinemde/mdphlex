@@ -4,9 +4,7 @@
 
 MDPhlex is a Phlex component for rendering Markdown. No... not rendering markdown into HTML, rendering plain Markdown, programmatically.
 
-MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or gemerating markdown output from componentized pieces..
-
-*But markdown is just text!?* Yes, but have you ever tried to render clean markdown with a lot of conditional logic? MDPhlex tames thr mess with a simple and familiar API. 
+MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or composing markdown out of componentized pieces.
 
 ## Installation
 
@@ -200,9 +198,11 @@ end
 
 ## Why MDPhlex?
 
-- **Component-based**: Build reusable Markdown components
+*But markdown is just text!?* Yes, but have you ever tried to render clean markdown from a lot of conditional logic? MDPhlex tames the mess with a simple and familiar API.
+
+- **Component-based**: Build reusable Markdown with simple ruby classes
 - **Dynamic Markdown**: Generate markdown from dynamic data
-- **Composable**: Mix Phlex::HTML and MDPhlex components freely
+- **Composable**: Mix Phlex and MDPhlex components freely
 
 ## License
 
