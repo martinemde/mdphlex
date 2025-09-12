@@ -84,7 +84,94 @@ Explain Ruby concepts and patterns</tool>
 
 ## Traditional Markdown Generation
 
-MDPhlex also works great for generating regular Markdown content:
+MDPhlex also works great for generating regular Markdown content.
+
+### Rails Integration with Markdown Rendering
+
+With Rails 8.1's native markdown support, MDPhlex components integrate seamlessly:
+
+~~~ruby
+# app/components/page_component.rb
+class PageComponent < MDPhlex::MD
+  def initialize(page)
+    @page = page
+  end
+
+  def view_template
+    h1 @page.title
+
+    p do
+      em "Last updated: #{@page.updated_at.strftime('%B %d, %Y')}"
+    end
+
+    hr
+
+    # Render page sections with proper markdown structure
+    @page.sections.each do |section|
+      h2 section.heading
+
+      p section.content
+
+      if section.code_example?
+        pre(language: section.language) { plain section.code }
+      end
+    end
+
+    if @page.references.any?
+      h2 "References"
+      ul do
+        @page.references.each do |ref|
+          li do
+            a(href: ref.url) { ref.title }
+          end
+        end
+      end
+    end
+  end
+end
+
+# app/controllers/pages_controller.rb
+class PagesController < ApplicationController
+  def show
+    @page = Page.find(params[:id])
+
+    respond_to do |format|
+      format.html
+      format.md { render markdown: PageComponent.new(@page) }
+    end
+  end
+end
+~~~
+
+When someone visits `/pages/123.md`, Rails will render:
+
+~~~markdown
+# Getting Started with Ruby
+
+*Last updated: September 12, 2025*
+
+---
+
+## Introduction
+
+Ruby is a dynamic, object-oriented programming language...
+
+## Basic Syntax
+
+Here's how to define a method in Ruby:
+
+```ruby
+def greet(name)
+  puts "Hello, #{name}!"
+end
+```
+
+## References
+- [Official Ruby Documentation](https://ruby-doc.org)
+- [Ruby Style Guide](https://rubystyle.guide)
+~~~
+
+### Dynamic Content Generation
 
 ~~~ruby
 class ArticleContent < MDPhlex::MD

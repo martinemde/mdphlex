@@ -40,6 +40,11 @@ module MDPhlex
       end
     end
 
+    # Render the markdown to a String using the Rails 8.1 standard to_markdown alias
+    def to_markdown
+      call
+    end
+
     def h1(content = nil, &)
       heading(1, content, &)
     end

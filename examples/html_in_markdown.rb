@@ -37,5 +37,14 @@ class HTMLInMarkdownExample < MDPhlex::MD
 end
 
 if __FILE__ == $0
-  puts HTMLInMarkdownExample.new.call
+  output = HTMLInMarkdownExample.new.call
+  puts output
+
+  File.write(
+    File.join(File.dirname(__FILE__), "html_in_markdown_output.md"),
+    output
+  )
+
+  puts "\n---"
+  puts "Output saved to examples/html_in_markdown_output.md"
 end

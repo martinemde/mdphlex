@@ -421,3 +421,21 @@ test "multiple register_block_elements" do
     </aside>
   MD
 end
+
+test "to_markdown works" do
+  example = Class.new(MDPhlex::MD) do
+    register_block_element :note
+
+    def view_template
+      note(type: "info") do
+        h3 "This is a note."
+      end
+    end
+  end
+
+  assert_equal example.new.to_markdown, <<~MD
+    <note type="info">
+    ### This is a note.
+    </note>
+  MD
+end
