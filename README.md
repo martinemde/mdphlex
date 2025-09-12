@@ -1,8 +1,9 @@
 # MDPhlex
 
-MDPhlex is a Phlex component for rendering Markdown. No... not rendering markdown into HTML, rendering plain Markdown, programmatically.
+MDPhlex is a Phlex component for rendering Markdown.
+No... not rendering markdown into HTML, rendering plain Markdown, programmatically.
 
-MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or composing markdown out of componentized pieces.
+MDPhlex is for dynamically creating context for LLMs, generating llms.txt files from real content, or composing markdown with components.
 
 ## Installation
 
@@ -24,9 +25,9 @@ Let's say you want to render:
 - [Source](https://github.com/martinemde/mdphlex)
 ~~~
 
-Generating clean Markdown with a `md.erb` file is ugly (trust me, or go try it).
+Generating clean Markdown with a `md.erb` file is ugly (check the [ERb comparison example](examples/mdphlex_over_erb.rb))
 
-**MDPhlex**, built on [Phlex](https://www.phlex.fun), makes it easy.
+**MDPhlex** with [Phlex](https://www.phlex.fun) makes it easy:
 
 ```
 bundle add phlex-rails mdphlex
@@ -36,11 +37,14 @@ bundle exec rails generate phlex:install
 ~~~ruby
 # app/views/llms/index.rb
 class Views::Llms::Index < MDPhlex::MD
+  def initialize(links)
+    @links = links
+  end
+
   def view_template
     h1 "MDPhlex"
-
     ul do
-      LINKS.each do |name, url|
+      @links.each do |name, url|
         li { a(href: url) { name } }
       end
     end
@@ -57,19 +61,18 @@ class LlmsController < ApplicationController
     }
 
     respond_to do |format|
-      format.text { render markdown: Views::Llms::Index.new(links) }
+      format.md { render markdown: Views::Llms::Index.new(links) }
     end
   end
 end
 
 # config/routes.rb
-get "/llms.txt", to: "llms#index", format: :text
+get "/llms.txt", to: "llms#index", format: :md
 ~~~
-
 
 ## Creating LLM Prompts with MDPhlex
 
-MDPhlex also shines when creating structured prompts for LLMs allowing comments and organization without cluttering the prompt. Here's a simple example using custom tags:
+MDPhlex also shines when creating structured prompts for LLMs allowing organization without cluttering the prompt. Here's a simple example using custom tags and showing how it's easy to comment on your prompt without affecting the output.
 
 ~~~ruby
 class LLMPrompt < MDPhlex::MD
@@ -297,11 +300,7 @@ class DocumentInfo < MDPhlex::MD
 end
 ```
 
-MDPhlex tames the mess with a simple and familiar API. Check out the [examples/](examples/) for more demonstrations.
-
-- **Component-based**: Build reusable Markdown with simple ruby classes
-- **Dynamic Markdown**: Generate markdown from dynamic data
-- **Composable**: Mix Phlex and MDPhlex components freely
+Check out the [examples/](examples/) for more.
 
 ## License
 
