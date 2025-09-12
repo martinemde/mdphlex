@@ -9,7 +9,7 @@ GIT
 PATH
   remote: .
   specs:
-    mdphlex (0.1.1)
+    mdphlex (0.2.0)
       phlex (~> 2.0)
       zeitwerk (~> 2.7)
 
