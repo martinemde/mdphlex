@@ -12,9 +12,64 @@ Add this line to your application's Gemfile:
 gem 'mdphlex'
 ~~~
 
+## Rendering /llms.txt with Rails 8.1
+
+Let's say you want to render:
+
+~~~markdown
+# MDPhlex
+
+- [Docs](https://github.com/martinemde/mdphlex/blob/main/README.md)
+- [RubyGem](https://rubygems.org/gems/mdphlex)
+- [Source](https://github.com/martinemde/mdphlex)
+~~~
+
+Generating clean Markdown with a `md.erb` file is ugly (trust me, or go try it).
+
+**MDPhlex**, built on [Phlex](https://www.phlex.fun), makes it easy.
+
+```
+bundle add phlex-rails mdphlex
+bundle exec rails generate phlex:install
+```
+
+~~~ruby
+# app/views/llms/index.rb
+class Views::Llms::Index < MDPhlex::MD
+  def view_template
+    h1 "MDPhlex"
+
+    ul do
+      LINKS.each do |name, url|
+        li { a(href: url) { name } }
+      end
+    end
+  end
+end
+
+# app/controllers/llms_controller.rb
+class LlmsController < ApplicationController
+  def index
+    links = {
+      "Docs" => "https://github.com/martinemde/mdphlex/blob/main/README.md",
+      "RubyGem" => "https://rubygems.org/gems/mdphlex",
+      "Source" => "https://github.com/martinemde/mdphlex"
+    }
+
+    respond_to do |format|
+      format.text { render markdown: Views::Llms::Index.new(links) }
+    end
+  end
+end
+
+# config/routes.rb
+get "/llms.txt", to: "llms#index", format: :text
+~~~
+
+
 ## Creating LLM Prompts with MDPhlex
 
-MDPhlex shines when creating structured prompts for LLMs allowing comments and organization without cluttering the prompt. Here's a simple example using custom tags:
+MDPhlex also shines when creating structured prompts for LLMs allowing comments and organization without cluttering the prompt. Here's a simple example using custom tags:
 
 ~~~ruby
 class LLMPrompt < MDPhlex::MD
@@ -31,7 +86,7 @@ class LLMPrompt < MDPhlex::MD
   def view_template
     system do
       p "You are an AI assistant specialized in #{@task}."
-      
+
       h2 "Goal"
       # we should define the goal more clearly.
       p "Use the available tools to help the user."
@@ -82,96 +137,7 @@ Explain Ruby concepts and patterns</tool>
 </tools>
 ~~~
 
-## Traditional Markdown Generation
-
-MDPhlex also works great for generating regular Markdown content.
-
-### Rails Integration with Markdown Rendering
-
-With Rails 8.1's native markdown support, MDPhlex components integrate seamlessly:
-
-~~~ruby
-# app/components/page_component.rb
-class PageComponent < MDPhlex::MD
-  def initialize(page)
-    @page = page
-  end
-
-  def view_template
-    h1 @page.title
-
-    p do
-      em "Last updated: #{@page.updated_at.strftime('%B %d, %Y')}"
-    end
-
-    hr
-
-    # Render page sections with proper markdown structure
-    @page.sections.each do |section|
-      h2 section.heading
-
-      p section.content
-
-      if section.code_example?
-        pre(language: section.language) { plain section.code }
-      end
-    end
-
-    if @page.references.any?
-      h2 "References"
-      ul do
-        @page.references.each do |ref|
-          li do
-            a(href: ref.url) { ref.title }
-          end
-        end
-      end
-    end
-  end
-end
-
-# app/controllers/pages_controller.rb
-class PagesController < ApplicationController
-  def show
-    @page = Page.find(params[:id])
-
-    respond_to do |format|
-      format.html
-      format.md { render markdown: PageComponent.new(@page) }
-    end
-  end
-end
-~~~
-
-When someone visits `/pages/123.md`, Rails will render:
-
-~~~markdown
-# Getting Started with Ruby
-
-*Last updated: September 12, 2025*
-
----
-
-## Introduction
-
-Ruby is a dynamic, object-oriented programming language...
-
-## Basic Syntax
-
-Here's how to define a method in Ruby:
-
-```ruby
-def greet(name)
-  puts "Hello, #{name}!"
-end
-```
-
-## References
-- [Official Ruby Documentation](https://ruby-doc.org)
-- [Ruby Style Guide](https://rubystyle.guide)
-~~~
-
-### Dynamic Content Generation
+MDPhlex also works great for generating regular Markdown content:
 
 ~~~ruby
 class ArticleContent < MDPhlex::MD
@@ -281,7 +247,57 @@ end
 
 ## Why MDPhlex?
 
-*But markdown is just text!?* Yes, but have you ever tried to render clean markdown from a lot of conditional logic? MDPhlex tames the mess with a simple and familiar API.
+*Generating text is easy! Why bother with complex components!?*
+
+This is what it looks like when you generate well formed markdown with ERb:
+
+```
+## Basic Information
+Document: <%= @content[:document_name].presence || 'N/A' %><% if @content[:source_url].present? %> [View Source](<%= @content[:source_url] %>)<% end %>
+* Description: <%= @content[:description].presence || 'N/A' %>
+<% if @content[:status].present? %>* Status: <%= @content[:status] %>
+<% end %><% if @content[:category].present? %>* Category: <%= @content[:category] %>
+<% end %><% if @content[:priority].present? %>* Priority: <%= @content[:priority] %>
+<% end %><% if @content[:author].present? %>* Author: <%= @content[:author] %>
+<% end %><% if @content[:tags].present? && @content[:tags].any? %>* Tags: <%= @content[:tags].join(', ') %>
+<% end %><% if @content[:topics].present? && @content[:topics].any? %>* Topics: <%= @content[:topics].join(', ') %>
+<% end %>
+```
+
+Compare that to MDPhlex.
+
+```ruby
+class DocumentInfo < MDPhlex::MD
+  def initialize(content)
+    @content = content
+  end
+
+  def view_template
+    h2 "Basic Information"
+
+    p do
+      plain "Document: #{@content[:document_name] || 'N/A'}"
+      if @content[:source_url]
+        plain " "
+        a(href: @content[:source_url]) { "View Source" }
+      end
+    end
+
+    ul do
+      li "Description: #{@content[:description] || 'N/A'}"
+
+      li "Status: #{@content[:status]}" if @content[:status]
+      li "Category: #{@content[:category]}" if @content[:category]
+      li "Priority: #{@content[:priority]}" if @content[:priority]
+      li "Author: #{@content[:author]}" if @content[:author]
+      li "Tags: #{@content[:tags].join(', ')}" if @content[:tags]&.any?
+      li "Topics: #{@content[:topics].join(', ')}" if @content[:topics]&.any?
+    end
+  end
+end
+```
+
+MDPhlex tames the mess with a simple and familiar API. Check out the [examples/](examples/) for more demonstrations.
 
 - **Component-based**: Build reusable Markdown with simple ruby classes
 - **Dynamic Markdown**: Generate markdown from dynamic data
