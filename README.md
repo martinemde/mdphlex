@@ -1,7 +1,5 @@
 # MDPhlex
 
-> Inversion of Markdown
-
 MDPhlex is a Phlex component for rendering Markdown. No... not rendering markdown into HTML, rendering plain Markdown, programmatically.
 
 MDPhlex is perfect for dynamically creating context for LLMs, generating an llms.txt file from real content, or composing markdown out of componentized pieces.
@@ -16,7 +14,7 @@ gem 'mdphlex'
 
 ## Creating LLM Prompts with MDPhlex
 
-MDPhlex shines when creating structured prompts for LLMs allowing comments and organixatiin without cluttering the prompt. Here's a simple example using custom tags:
+MDPhlex shines when creating structured prompts for LLMs allowing comments and organization without cluttering the prompt. Here's a simple example using custom tags:
 
 ~~~ruby
 class LLMPrompt < MDPhlex::MD
