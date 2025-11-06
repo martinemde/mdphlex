@@ -20,18 +20,14 @@ module MDPhlex
         # Render the opening tag - always followed by newline
         buffer << "<#{tag}"
 
-        if attributes.length > 0
-          attributes.each do |key, value|
-            buffer << " #{key}=\"#{value}\""
-          end
+        attributes.each do |key, value|
+          buffer << " #{key}=\"#{value}\""
         end
 
         buffer << ">\n"
 
         # Render content if block given
-        if block
-          __yield_content__(&block)
-        end
+        __yield_content__(&block) if block
 
         # Render closing tag - always followed by newline for block elements
         buffer << "</#{tag}>\n"
@@ -126,25 +122,19 @@ module MDPhlex
 
       buffer = state.buffer
 
-      if block_given?
-        # Save current position to capture content
+      # Capture content from block or use provided content
+      text = if block_given?
         start_pos = buffer.length
         __yield_content__(&)
-        # Extract the content that was added
         captured = buffer[start_pos..]
-        # Remove it from buffer to re-add with > prefix
         buffer.slice!(start_pos..)
-
-        # Add > prefix to each line
-        captured.lines.each do |line|
-          buffer << "> " << line
-        end
+        captured
       else
-        content.to_s.lines.each do |line|
-          buffer << "> " << line
-        end
+        content.to_s
       end
 
+      # Add > prefix to each line
+      text.lines.each { |line| buffer << "> " << line }
       buffer << "\n\n"
       nil
     end
@@ -172,7 +162,7 @@ module MDPhlex
       @_list_type ||= []
 
       # If we're in a list item and there's already content, add a newline
-      buffer << "\n" if @_list_type.length > 0 && buffer.length > 0 && !buffer.end_with?("\n")
+      buffer << "\n" if @_list_type.any? && buffer.length > 0 && !buffer.end_with?("\n")
 
       @_list_type.push(:ul)
 
@@ -192,7 +182,7 @@ module MDPhlex
       @_list_type ||= []
 
       # If we're in a list item and there's already content, add a newline
-      buffer << "\n" if @_list_type.length > 0 && buffer.length > 0 && !buffer.end_with?("\n")
+      buffer << "\n" if @_list_type.any? && buffer.length > 0 && !buffer.end_with?("\n")
 
       @_list_type.push(:ol)
       @_ol_counter ||= []
@@ -213,10 +203,9 @@ module MDPhlex
 
       buffer = state.buffer
       @_list_type ||= []
-      list_depth = @_list_type.length
+      list_indent = @_list_type.length - 1
 
-      # Add indentation for nested lists
-      buffer << ("  " * [list_depth - 1, 0].max)
+      buffer << ("  " * list_indent) if list_indent.positive?
 
       # Add list marker
       if @_list_type.last == :ol
@@ -228,16 +217,12 @@ module MDPhlex
       end
 
       if block_given?
-        # Mark position before yielding content
-        start_pos = buffer.length
         __yield_content__(&)
-        # Only add newline if we haven't already ended with one
-        # (nested lists already add their trailing newline)
-        buffer << "\n" unless buffer.end_with?("\n")
       else
-        buffer << content.to_s if content
-        buffer << "\n"
+        buffer << content.to_s
       end
+
+      buffer << "\n" unless buffer.end_with?("\n")
 
       nil
     end
@@ -307,35 +292,26 @@ module MDPhlex
 
     # Override __text__ to avoid HTML escaping since markdown allows raw HTML
     private def __text__(content)
-      state = @_state
-      return true unless state.should_render?
-
-      case content
-      when String
-        state.buffer << content
-      when Symbol
-        state.buffer << content.name
-      when nil
-        nil
-      else
-        if (formatted_object = format_object(content))
-          state.buffer << formatted_object
-        else
-          return false
-        end
-      end
-
-      true
+      __render_content__(content)
     end
 
     # Override __implicit_output__ to avoid HTML escaping
     private def __implicit_output__(content)
+      __render_content__(content, safe_object: true)
+    end
+
+    # Shared helper for rendering content without HTML escaping
+    private def __render_content__(content, safe_object: false)
       state = @_state
       return true unless state.should_render?
 
-      case content
-      when Phlex::SGML::SafeObject
+      # Handle SafeObject only if safe_object flag is true
+      if safe_object && content.is_a?(Phlex::SGML::SafeObject)
         state.buffer << content.to_s
+        return true
+      end
+
+      case content
       when String
         state.buffer << content
       when Symbol
